@@ -13,4 +13,5 @@ public class AuthenticationException extends Exception {
     public AuthenticationException() {
         super("Could not be Authenticated");
     }
+
 }
