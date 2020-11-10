@@ -83,5 +83,4 @@ public class UserResource {
         return Response.ok(userDTO).build();
     }
 
-    
 }

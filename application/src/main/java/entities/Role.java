@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -53,6 +52,14 @@ public class Role implements Serializable {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public void setDefaultRole(boolean condition) {
+        defaultRole = condition;
+    }
+
+    public boolean getDefaultRole() {
+        return defaultRole;
     }
 
     public List<User> getUserList() {

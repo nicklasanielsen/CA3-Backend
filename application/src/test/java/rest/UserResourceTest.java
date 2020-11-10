@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package rest;
 
 import entities.Role;
@@ -40,9 +35,12 @@ public class UserResourceTest {
     private static final int SERVER_PORT = 7777;
     private static final String SERVER_URL = "http://localhost/api";
     private static User user;
+    private static User admin;
     private static Role role1;
     private static Role role2;
     private static List<Role> roles;
+    private static List<Role> adminRole;
+    private static String securityToken;
 
     static final URI BASE_URI = UriBuilder.fromUri(SERVER_URL).port(SERVER_PORT).build();
     private static HttpServer httpServer;
@@ -59,11 +57,25 @@ public class UserResourceTest {
         emf = EMF_Creator.createEntityManagerFactoryForTest();
 
         roles = new ArrayList<>();
+        adminRole = new ArrayList<>();
 
         httpServer = startServer();
         RestAssured.baseURI = SERVER_URL;
         RestAssured.port = SERVER_PORT;
         RestAssured.defaultParser = Parser.JSON;
+        role1 = new Role("User");
+        role2 = new Role("Admin");
+        
+        EntityManager em = emf.createEntityManager();
+        
+        try {
+            em.getTransaction().begin();
+            em.persist(role1);
+            em.persist(role2);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
     }
 
     @AfterAll
@@ -85,15 +97,15 @@ public class UserResourceTest {
     public void setUp() {
         EntityManager em = emf.createEntityManager();
 
-        role1 = new Role("user");
-        role2 = new Role("admin");
         roles.add(role1);
-        roles.add(role2);
+        adminRole.add(role2);
         user = new User("userName", "Sven", "Bentsen", "password123", roles);
+        admin = new User("admin", "Admin", "Jensen", "1234", adminRole);
 
         try {
             em.getTransaction().begin();
             em.persist(user);
+            em.persist(admin);
             em.getTransaction().commit();
 
         } finally {
@@ -117,19 +129,16 @@ public class UserResourceTest {
     }
 
     //This is how we hold on to the token after login, similar to that a client must store the token somewhere
-    private static String securityToken;
+    
 
     //Utility method to login and set the returned securityToken
-    private static void login(String role, String password) {
-        String json = String.format("{username: \"%s\", password: \"%s\"}", role, password);
-        securityToken = given()
-                .contentType("application/json")
-                .body(json)
-                //.when().post("/api/login")
-                .when().post("/login")
+    private static String login(String username, String password) {
+        return given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{username: \"%s\", password: \"%s\"}", username, password))
+                .when().post("/auth/login")
                 .then()
                 .extract().path("token");
-        //System.out.println("TOKEN ---> " + securityToken);
     }
 
     @Test
@@ -144,7 +153,7 @@ public class UserResourceTest {
 
     @Test
     public void testGetFromUser() {
-        login("user", "password123");
+        securityToken = login("userName", "password123");
         given()
                 .contentType("application/json")
                 .header("x-access-token", securityToken)
@@ -153,10 +162,22 @@ public class UserResourceTest {
                 .statusCode(200)
                 .body("msg", equalTo("Hello to User: userName"));
     }
+    
+    @Test
+    public void testGetFromUserAsAdmin() {
+        securityToken = login("admin", "1234");
+        given()
+                .contentType("application/json")
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/user").then()
+                .statusCode(401)
+                .body("msg", equalTo(null));
+    }
 
     @Test
     public void testGetFromAdmin() {
-        login("user", "password123");
+        securityToken = login("admin", "1234");
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
@@ -164,6 +185,33 @@ public class UserResourceTest {
                 .when()
                 .get("/info/admin").then()
                 .statusCode(200)
-                .body("msg", equalTo("Hello to (admin) User: userName"));
+                .body("msg", equalTo("Hello to (admin) User: admin"));
     }
+    
+    @Test
+    public void testGetFromAdminAsUser() {
+        securityToken = login("userName", "password123");
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/admin").then()
+                .statusCode(401)
+                .body("msg", equalTo(null));
+    }
+    /*
+    @Test
+    public void testGetAllUsers(){
+        securityToken = login("user", "password123");
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/allUsers").then()
+                .statusCode(200)
+                .body();
+    }
+    */
 }
