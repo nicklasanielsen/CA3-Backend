@@ -1,8 +1,6 @@
 package DTOs;
 
 import entities.Role;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,28 +10,19 @@ import java.util.Objects;
 public class RoleDTO {
 
     private String roleName;
-    private List<UserDTO> userList = new ArrayList<>();
 
     public RoleDTO(Role role) {
         this.roleName = role.getRoleName();
-        
-        role.getUserList().forEach(user -> {
-            userList.add(new UserDTO(user));
-        });
     }
 
     public String getRoleName() {
         return roleName;
     }
 
-    public List<UserDTO> getUserList() {
-        return userList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.roleName);
+        hash = 29 * hash + Objects.hashCode(this.roleName);
         return hash;
     }
 
@@ -54,4 +43,5 @@ public class RoleDTO {
         }
         return true;
     }
+    
 }

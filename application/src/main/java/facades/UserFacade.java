@@ -21,7 +21,7 @@ public class UserFacade {
 
     private static EntityManagerFactory emf;
     private static UserFacade instance;
-    private final static List<Role> DEFAULT_ROLES = new ArrayList<>();
+    private static RoleFacade roleFacade;
 
     private UserFacade() {
         // Private constructor to ensure Singleton
@@ -30,8 +30,8 @@ public class UserFacade {
     public static UserFacade getUserFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
+            roleFacade = RoleFacade.getRoleFacade(emf);
             instance = new UserFacade();
-            DEFAULT_ROLES.add(new Role("User"));
         }
 
         return instance;
@@ -44,7 +44,9 @@ public class UserFacade {
     public UserDTO createUser(String username, String firstName, String lastName, String password) throws DatabaseException, UserCreationException {
         EntityManager em = getEntityManager();
 
-        User user = new User(username, firstName, lastName, password, DEFAULT_ROLES);
+        List<Role> defaultRoles = roleFacade.getDefaultRoles();
+
+        User user = new User(username, firstName, lastName, password, defaultRoles);
 
         try {
             // Checking if username is in use
@@ -54,6 +56,11 @@ public class UserFacade {
 
             em.getTransaction().begin();
             em.persist(user);
+
+            for (Role role : user.getRoles()) {
+                em.merge(role);
+            }
+
             em.getTransaction().commit();
 
             return new UserDTO(user);
@@ -65,6 +72,8 @@ public class UserFacade {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+
+            System.out.println(e);
 
             throw new DatabaseException("Something went wrong! Failed to create user, please try again later.");
         } finally {

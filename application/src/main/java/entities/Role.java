@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -18,6 +21,9 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "ROLES")
+@NamedQueries({
+    @NamedQuery(name = "Role.deleteAllRows", query = "DELETE FROM Role"),
+    @NamedQuery(name = "Role.getDefaults", query = "SELECT r FROM Role r WHERE r.defaultRole = TRUE")})
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +32,9 @@ public class Role implements Serializable {
     @NotNull
     @Column(name = "ROLE_NAME", length = 20)
     private String roleName;
+
+    @Column(name = "DEFAULT_ROLE")
+    private boolean defaultRole = false;
 
     @ManyToMany(mappedBy = "roles")
     private List<User> userList;
@@ -57,14 +66,14 @@ public class Role implements Serializable {
     public void addUser(User user) {
         if (!userList.contains(user)) {
             userList.add(user);
-            user.addRole(this);
+            user.getRoles().add(this);
         }
     }
 
     public void removeUser(User user) {
         if (userList.contains(user)) {
             userList.remove(user);
-            user.removeRole(this);
+            user.getRoles().remove(this);
         }
     }
 
