@@ -2,15 +2,15 @@ package security.errorhandling;
 
 /**
  *
- * @author lam@cphbusiness.dk
+ * @author Nicklas Nielsen
  */
-public class AuthenticationException extends Exception{
+public class AuthenticationException extends Exception {
 
-    public AuthenticationException(String message) {
-        super(message);
+    public AuthenticationException(String msg) {
+        super(msg);
     }
 
     public AuthenticationException() {
         super("Could not be Authenticated");
-    }  
+    }
 }
