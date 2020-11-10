@@ -20,10 +20,10 @@ public class UserDTO {
         this.userName = user.getUserName();
         this.fullName = user.getFirstName() + " " + user.getLastName();
 
-        user.getRoleList().forEach(role -> {
+        user.getRoles().forEach(role -> {
             roleList.add(new RoleDTO(role));
         });
-        
+
         this.created = user.getCreated();
     }
 

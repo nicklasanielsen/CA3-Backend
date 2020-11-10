@@ -2,7 +2,9 @@ package entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,82 +13,171 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.mindrot.jbcrypt.BCrypt;
 
+/**
+ *
+ * @author Nicklas Nielsen
+ */
 @Entity
-@Table(name = "users")
+@Table(name = "USERS")
 public class User implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-  @Id
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "user_name", length = 25)
-  private String userName;
-  @Basic(optional = false)
-  @NotNull
-  @Size(min = 1, max = 255)
-  @Column(name = "user_pass")
-  private String userPass;
-  @JoinTable(name = "user_roles", joinColumns = {
-    @JoinColumn(name = "user_name", referencedColumnName = "user_name")}, inverseJoinColumns = {
-    @JoinColumn(name = "role_name", referencedColumnName = "role_name")})
-  @ManyToMany
-  private List<Role> roleList = new ArrayList<>();
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "USERNAME", length = 25)
+    private String userName;
 
-  public List<String> getRolesAsStrings() {
-    if (roleList.isEmpty()) {
-      return null;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "FIRSTNAME")
+    private String firstName;
+
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "LASTNAME")
+    private String lastName;
+
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "CREATED")
+    @Temporal(TemporalType.DATE)
+    private Date created;
+
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "PASSWORD")
+    private String password;
+
+    @ManyToMany
+    @JoinTable(name = "LK_USERS_ROLES", joinColumns = {
+        @JoinColumn(name = "USER", referencedColumnName = "USERNAME")}, inverseJoinColumns = {
+        @JoinColumn(name = "ROLE", referencedColumnName = "ROLE_NAME")})
+    private List<Role> roles;
+
+    public User(String username, String firstname, String lastname, String password, List<Role> roles) {
+        this.userName = username;
+        this.firstName = firstname;
+        this.lastName = lastname;
+        this.roles = roles;
+        this.password = getHashWithSalt(password);
+        created = new Date();
     }
-    List<String> rolesAsStrings = new ArrayList<>();
-    roleList.forEach((role) -> {
-        rolesAsStrings.add(role.getRoleName());
-      });
-    return rolesAsStrings;
-  }
 
-  public User() {}
-
-  //TODO Change when password is hashed
-   public boolean verifyPassword(String pw){
-        return(pw.equals(userPass));
+    public User() {
+        this.roles = new ArrayList<>();
     }
 
-  public User(String userName, String userPass) {
-    this.userName = userName;
+    public String getUserName() {
+        return userName;
+    }
 
-    this.userPass = userPass;
-  }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
+    public String getFirstName() {
+        return firstName;
+    }
 
-  public String getUserName() {
-    return userName;
-  }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    public String getLastName() {
+        return lastName;
+    }
 
-  public String getUserPass() {
-    return this.userPass;
-  }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-  public void setUserPass(String userPass) {
-    this.userPass = userPass;
-  }
+    public Date getCreated() {
+        return created;
+    }
 
-  public List<Role> getRoleList() {
-    return roleList;
-  }
+    public boolean verifyPassword(String password) {
+        return BCrypt.checkpw(password, this.password);
+    }
 
-  public void setRoleList(List<Role> roleList) {
-    this.roleList = roleList;
-  }
+    public void setPassword(String password) {
+        this.password = getHashWithSalt(password);
+    }
 
-  public void addRole(Role userRole) {
-    roleList.add(userRole);
-  }
+    private String getHashWithSalt(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(4));
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void addRole(Role role) {
+        if (!roles.contains(role)) {
+            roles.add(role);
+            role.addUser(this);
+        }
+    }
+
+    public void removeRole(Role role) {
+        if (roles.contains(role)) {
+            roles.remove(role);
+            role.removeUser(this);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.userName);
+        hash = 89 * hash + Objects.hashCode(this.firstName);
+        hash = 89 * hash + Objects.hashCode(this.lastName);
+        hash = 89 * hash + Objects.hashCode(this.created);
+        hash = 89 * hash + Objects.hashCode(this.password);
+        hash = 89 * hash + Objects.hashCode(this.roles);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final User other = (User) obj;
+        if (!Objects.equals(this.userName, other.userName)) {
+            return false;
+        }
+        if (!Objects.equals(this.firstName, other.firstName)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastName, other.lastName)) {
+            return false;
+        }
+        if (!Objects.equals(this.password, other.password)) {
+            return false;
+        }
+        if (!Objects.equals(this.created, other.created)) {
+            return false;
+        }
+        if (!Objects.equals(this.roles, other.roles)) {
+            return false;
+        }
+        return true;
+    }
 
 }
