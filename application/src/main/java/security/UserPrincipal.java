@@ -8,27 +8,30 @@ import java.util.List;
 
 public class UserPrincipal implements Principal {
 
-  private String username;
-  private List<String> roles = new ArrayList<>();
+    private String username;
+    private List<String> roles = new ArrayList<>();
 
-  /* Create a UserPrincipal, given the Entity class User*/
-  public UserPrincipal(User user) {
-    this.username = user.getUserName();
-    this.roles = user.getRolesAsStrings();
-  }
+    /* Create a UserPrincipal, given the Entity class User*/
+    public UserPrincipal(User user) {
+        username = user.getUserName();
 
-  public UserPrincipal(String username, String[] roles) {
-    super();
-    this.username = username;
-    this.roles = Arrays.asList(roles);
-  }
+        user.getRoles().forEach(role -> {
+            roles.add(role.getRoleName());
+        });
+    }
 
-  @Override
-  public String getName() {
-    return username;
-  }
+    public UserPrincipal(String username, String[] roles) {
+        this.username = username;
+        this.roles = Arrays.asList(roles);
+    }
 
-  public boolean isUserInRole(String role) {
-    return this.roles.contains(role);
-  }
+    @Override
+    public String getName() {
+        return username;
+    }
+
+    public boolean isUserInRole(String role) {
+        return roles.contains(role);
+    }
+
 }
