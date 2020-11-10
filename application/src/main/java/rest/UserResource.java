@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import utils.EMF_Creator;
 
@@ -54,18 +55,18 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("user")
     @RolesAllowed("user")
-    public String getFromUser() {
+    public Response getFromUser() {
         String thisUser = securityContext.getUserPrincipal().getName();
-        return "{\"msg\": \"Hello to User: " + thisUser + "\"}";
+        return Response.ok("{\"msg\": \"Hello to User: " + thisUser + "\"}").build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("admin")
     @RolesAllowed("admin")
-    public String getFromAdmin() {
+    public Response getFromAdmin() {
         String thisUser = securityContext.getUserPrincipal().getName();
-        return "{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}";
+        return Response.ok("{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}").build();
     }
 
 }
