@@ -1,6 +1,7 @@
 package security;
 
-import java.security.SecureRandom;
+import io.jsonwebtoken.impl.crypto.MacProvider;
+import javax.crypto.SecretKey;
 
 /**
  *
@@ -8,12 +9,11 @@ import java.security.SecureRandom;
  */
 public class SharedSecret {
 
-    private static byte[] secret;
+    private static SecretKey secret;
 
-    public static byte[] getSharedKey() {
+    public static SecretKey getSharedKey() {
         if (secret == null) {
-            secret = new byte[32];
-            new SecureRandom().nextBytes(secret);
+            secret = MacProvider.generateKey();
         }
 
         return secret;

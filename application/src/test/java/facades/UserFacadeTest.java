@@ -122,7 +122,7 @@ public class UserFacadeTest {
     }
 
     @Test
-    public void login_Fail_Invalid_Username() {
+    public void login_Failed_Invalid_Username() {
         user.setUserName("testUser");
 
         assertThrows(AuthenticationException.class, () -> {
@@ -131,7 +131,7 @@ public class UserFacadeTest {
     }
 
     @Test
-    public void login_Fail_Incorrect_Password() {
+    public void login_Failed_Incorrect_Password() {
         assertThrows(AuthenticationException.class, () -> {
             facade.login(user.getUserName(), "INCORRECT_PASSWORD");
         });

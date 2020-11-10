@@ -88,7 +88,7 @@ public class UserFacade {
             User user = em.find(User.class, userName);
 
             if (user == null || !user.verifyPassword(password)) {
-                throw new AuthenticationException();
+                throw new AuthenticationException("Invalid username and/or password.");
             }
 
             return new UserDTO(user);

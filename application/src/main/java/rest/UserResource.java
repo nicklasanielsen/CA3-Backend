@@ -80,12 +80,4 @@ public class UserResource {
         return Response.ok("{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}").build();
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(String username, String firstName, String lastName, String password) throws DatabaseException, UserCreationException {
-        UserDTO userAdded = FACADE.createUser(username, firstName, lastName, password);
-        return Response.ok(userAdded).build();
-    }
-    
 }
