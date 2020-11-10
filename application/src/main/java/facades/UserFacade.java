@@ -1,46 +1,127 @@
 package facades;
 
+import DTOs.UserDTO;
+import entities.Role;
 import entities.User;
+import errorhandling.DatabaseException;
+import errorhandling.UserCreationException;
+import errorhandling.UserNotFound;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import security.errorhandling.AuthenticationException;
 
 /**
- * @author lam@cphbusiness.dk
+ *
+ * @author Nicklas Nielsen
  */
 public class UserFacade {
 
     private static EntityManagerFactory emf;
     private static UserFacade instance;
+    private final static List<Role> DEFAULT_ROLES = new ArrayList<>();
 
     private UserFacade() {
+        // Private constructor to ensure Singleton
     }
 
-    /**
-     *
-     * @param _emf
-     * @return the instance of this facade.
-     */
     public static UserFacade getUserFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
             instance = new UserFacade();
+            DEFAULT_ROLES.add(new Role("User"));
         }
+
         return instance;
     }
 
-    public User getVeryfiedUser(String username, String password) throws AuthenticationException {
-        EntityManager em = emf.createEntityManager();
-        User user;
+    private EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
+
+    public UserDTO createUser(String username, String firstName, String lastName, String password) throws DatabaseException, UserCreationException {
+        EntityManager em = getEntityManager();
+
+        User user = new User(username, firstName, lastName, password, DEFAULT_ROLES);
+
         try {
-            user = em.find(User.class, username);
-            if (user == null || !user.verifyPassword(password)) {
-                throw new AuthenticationException("Invalid user name or password");
+            // Checking if username is in use
+            if (em.find(User.class, username) != null) {
+                throw new UserCreationException("username already in use");
             }
+
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+
+            return new UserDTO(user);
+        } catch (Exception e) {
+            if (e instanceof UserCreationException) {
+                throw e;
+            }
+
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+
+            throw new DatabaseException("Something went wrong! Failed to create user, please try again later.");
         } finally {
             em.close();
         }
-        return user;
+    }
+
+    public UserDTO login(String userName, String password) throws AuthenticationException {
+        EntityManager em = getEntityManager();
+
+        try {
+            User user = em.find(User.class, userName);
+
+            if (user == null || !user.verifyPassword(password)) {
+                throw new AuthenticationException();
+            }
+
+            return new UserDTO(user);
+        } finally {
+            em.close();
+        }
+    }
+
+    public UserDTO getUserByUserName(String username) throws UserNotFound {
+        EntityManager em = getEntityManager();
+
+        try {
+            User user = em.find(User.class, username);
+
+            if (user == null) {
+                throw new UserNotFound(username);
+            }
+
+            return new UserDTO(user);
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<UserDTO> getAllUsers() {
+        EntityManager em = getEntityManager();
+
+        List<User> users;
+        List<UserDTO> userDTOs = new ArrayList<>();
+
+        try {
+            Query query = em.createNamedQuery("User.getAll");
+            users = query.getResultList();
+
+            users.forEach(user -> {
+                userDTOs.add(new UserDTO(user));
+            });
+
+            return userDTOs;
+        } finally {
+            em.close();
+        }
     }
 
 }

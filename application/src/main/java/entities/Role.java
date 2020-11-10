@@ -26,7 +26,7 @@ public class Role implements Serializable {
     @NotNull
     @Column(name = "ROLE_NAME", length = 20)
     private String roleName;
-    
+
     @ManyToMany(mappedBy = "roles")
     private List<User> userList;
 
@@ -37,7 +37,7 @@ public class Role implements Serializable {
 
     public Role() {
     }
-    
+
     public String getRoleName() {
         return roleName;
     }
@@ -53,16 +53,16 @@ public class Role implements Serializable {
     public void setUserList(List<User> userList) {
         this.userList = userList;
     }
-    
+
     public void addUser(User user) {
-        if(!userList.contains(user)){
+        if (!userList.contains(user)) {
             userList.add(user);
             user.addRole(this);
-        }        
+        }
     }
-    
+
     public void removeUser(User user) {
-        if(userList.contains(user)){
+        if (userList.contains(user)) {
             userList.remove(user);
             user.removeRole(this);
         }
@@ -92,6 +92,5 @@ public class Role implements Serializable {
         }
         return true;
     }
-    
-    
+
 }
