@@ -3,7 +3,6 @@ package DTOs;
 import entities.Role;
 import entities.User;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
@@ -17,25 +16,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Nikolaj Larsen
  */
 public class UserDTOTest {
-    List<Role> roles;
-    User user;
-    UserDTO dto;
-    
-    public UserDTOTest() {
-    }
+    private static List<Role> roles;
+    private User user;
+    private UserDTO dto;
     
     @BeforeAll
-    public static void setUpClass() {
-        
-    }
-    
-    @AfterAll
-    public static void tearDownClass() {
+    public static void setupClass() {
+        roles = new ArrayList<>();
     }
     
     @BeforeEach
     public void setUp() {
-        roles = new ArrayList<>();
         roles.add(new Role("User"));
         user = new User("User1", "Sven", "Svensen", "password123", roles);
         dto = new UserDTO(user);
@@ -43,63 +34,30 @@ public class UserDTOTest {
     
     @AfterEach
     public void tearDown() {
+        roles.clear();
+        user = null;
+        dto = null;
     }
-
-    /**
-     * Test of getUserName method, of class UserDTO.
-     */
-    @Test
-    public void testGetUserName() {
-        System.out.println("getUserName");
-        UserDTO instance = dto;
-        
-        String expResult = "User1";
-        String result = instance.getUserName();
-        
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getFullName method, of class UserDTO.
-     */
+    
     @Test
     public void testGetFullName() {
-        System.out.println("getFullName");
-        UserDTO instance = dto;
+        String expected = "Sven Svensen";
         
-        String expResult = "Sven Svensen";
-        String result = instance.getFullName();
+        String actual = dto.getFullName();
         
-        assertEquals(expResult, result);
+        assertEquals(expected, actual);
     }
-
-    /**
-     * Test of getCreated method, of class UserDTO.
-     */
-    @Test
-    public void testGetCreated() {
-        System.out.println("getCreated");
-        UserDTO instance = dto;
-        
-        assertNotNull(instance.getCreated());
-    }
-
-    /**
-     * Test of getRoleList method, of class UserDTO.
-     */
+    
     @Test
     public void testGetRoleList() {
-        Role role1 = new Role("User");
-        RoleDTO roledto = new RoleDTO(role1);
-        List<RoleDTO> rolerole = new ArrayList<>();
-        rolerole.add(roledto);
-        System.out.println("getRoleList");
-        UserDTO instance = dto;
+        List<RoleDTO> expected = new ArrayList<>();
+        for(Role role : roles){
+        expected.add(new RoleDTO(role));
+        }
         
-        List<RoleDTO> expResult = rolerole;
-        List<RoleDTO> result = instance.getRoleList();
-        
-        assertEquals(expResult, result);
+        List<RoleDTO> actual = dto.getRoleList();
+       
+        assertTrue(actual.containsAll(expected));
     }
     
 }
