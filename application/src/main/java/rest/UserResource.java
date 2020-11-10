@@ -25,7 +25,7 @@ import javax.ws.rs.core.SecurityContext;
 import utils.EMF_Creator;
 
 /**
- * @author lam@cphbusiness.dk
+ * @author Mathias Nielsen
  */
 @Path("info")
 public class UserResource {
@@ -66,18 +66,18 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("user")
     @RolesAllowed("user")
-    public String getFromUser() {
+    public Response getFromUser() {
         String thisUser = securityContext.getUserPrincipal().getName();
-        return "{\"msg\": \"Hello to User: " + thisUser + "\"}";
+        return Response.ok("{\"msg\": \"Hello to User: " + thisUser + "\"}").build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("admin")
     @RolesAllowed("admin")
-    public String getFromAdmin() {
+    public Response getFromAdmin() {
         String thisUser = securityContext.getUserPrincipal().getName();
-        return "{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}";
+        return Response.ok("{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}").build();
     }
 
     @POST
