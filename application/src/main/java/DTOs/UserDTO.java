@@ -1,9 +1,11 @@
 package DTOs;
 
+import entities.Role;
 import entities.User;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -20,9 +22,9 @@ public class UserDTO {
         this.userName = user.getUserName();
         this.fullName = user.getFirstName() + " " + user.getLastName();
 
-        user.getRoles().forEach(role -> {
+        for (Role role : user.getRoles()) {
             roleList.add(new RoleDTO(role));
-        });
+        }
 
         this.created = user.getCreated();
     }
@@ -41,6 +43,40 @@ public class UserDTO {
 
     public List<RoleDTO> getRoleList() {
         return roleList;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + Objects.hashCode(this.userName);
+        hash = 53 * hash + Objects.hashCode(this.fullName);
+        hash = 53 * hash + Objects.hashCode(this.roleList);
+        hash = 53 * hash + Objects.hashCode(this.created);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UserDTO other = (UserDTO) obj;
+        if (!Objects.equals(this.userName, other.userName)) {
+            return false;
+        }
+        if (!Objects.equals(this.fullName, other.fullName)) {
+            return false;
+        }
+        if (!Objects.equals(this.roleList, other.roleList)) {
+            return false;
+        }
+        return true;
     }
 
 }

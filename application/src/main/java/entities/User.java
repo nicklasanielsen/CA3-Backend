@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,6 +27,9 @@ import org.mindrot.jbcrypt.BCrypt;
  */
 @Entity
 @Table(name = "USERS")
+@NamedQueries({
+    @NamedQuery(name = "User.getAll", query = "SELECT u FROM User u"),
+    @NamedQuery(name = "User.deleteAllRows", query = "DELETE FROM User")})
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -68,9 +73,13 @@ public class User implements Serializable {
         this.userName = username;
         this.firstName = firstname;
         this.lastName = lastname;
-        this.roles = roles;
+        this.roles = new ArrayList<>();
         this.password = getHashWithSalt(password);
         created = new Date();
+
+        roles.forEach((Role role) -> {
+            addRole(role);
+        });
     }
 
     public User() {
@@ -124,14 +133,14 @@ public class User implements Serializable {
     public void addRole(Role role) {
         if (!roles.contains(role)) {
             roles.add(role);
-            role.addUser(this);
+            role.getUserList().add(this);
         }
     }
 
     public void removeRole(Role role) {
         if (roles.contains(role)) {
             roles.remove(role);
-            role.removeUser(this);
+            role.getUserList().remove(this);
         }
     }
 
