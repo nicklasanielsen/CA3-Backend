@@ -1,6 +1,5 @@
 package rest;
 
-import com.google.gson.Gson;
 import entities.User;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
@@ -20,8 +19,8 @@ import utils.EMF_Creator;
  * @author lam@cphbusiness.dk
  */
 @Path("info")
-public class DemoResource {
-    
+public class UserResource {
+
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     @Context
     private UriInfo context;
@@ -43,7 +42,7 @@ public class DemoResource {
 
         EntityManager em = EMF.createEntityManager();
         try {
-            TypedQuery<User> query = em.createQuery ("select u from User u",entities.User.class);
+            TypedQuery<User> query = em.createQuery("select u from User u", entities.User.class);
             List<User> users = query.getResultList();
             return "[" + users.size() + "]";
         } finally {
@@ -56,8 +55,8 @@ public class DemoResource {
     @Path("user")
     @RolesAllowed("user")
     public String getFromUser() {
-        String thisuser = securityContext.getUserPrincipal().getName();
-        return "{\"msg\": \"Hello to User: " + thisuser + "\"}";
+        String thisUser = securityContext.getUserPrincipal().getName();
+        return "{\"msg\": \"Hello to User: " + thisUser + "\"}";
     }
 
     @GET
@@ -65,7 +64,8 @@ public class DemoResource {
     @Path("admin")
     @RolesAllowed("admin")
     public String getFromAdmin() {
-        String thisuser = securityContext.getUserPrincipal().getName();
-        return "{\"msg\": \"Hello to (admin) User: " + thisuser + "\"}";
+        String thisUser = securityContext.getUserPrincipal().getName();
+        return "{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}";
     }
+
 }
