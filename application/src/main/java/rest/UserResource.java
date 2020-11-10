@@ -7,6 +7,7 @@ import errorhandling.DatabaseException;
 import errorhandling.UserCreationException;
 import facades.UserFacade;
 import entities.User;
+import errorhandling.UserNotFound;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -46,26 +47,10 @@ public class UserResource {
         return "{\"msg\":\"Hello anonymous\"}";
     }
 
-    //Just to verify if the database is setup
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("all")
-    public String allUsers() {
-
-        EntityManager em = EMF.createEntityManager();
-        try {
-            TypedQuery<User> query = em.createQuery("select u from User u", entities.User.class);
-            List<User> users = query.getResultList();
-            return "[" + users.size() + "]";
-        } finally {
-            em.close();
-        }
-    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("user")
-    @RolesAllowed("user")
+    @RolesAllowed("User")
     public Response getFromUser() {
         String thisUser = securityContext.getUserPrincipal().getName();
         return Response.ok("{\"msg\": \"Hello to User: " + thisUser + "\"}").build();
@@ -74,18 +59,29 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("admin")
-    @RolesAllowed("admin")
+    @RolesAllowed("Admin")
     public Response getFromAdmin() {
         String thisUser = securityContext.getUserPrincipal().getName();
         return Response.ok("{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}").build();
     }
-
-    @POST
+    
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(String username, String firstName, String lastName, String password) throws DatabaseException, UserCreationException {
-        UserDTO userAdded = FACADE.createUser(username, firstName, lastName, password);
-        return Response.ok(userAdded).build();
+    @Path("allUsers")
+    @RolesAllowed("admin")
+    public Response getAllUsers(){
+        List<UserDTO> users = FACADE.getAllUsers();
+        return Response.ok(users).build();
     }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("getUser")
+    @RolesAllowed("User")
+    public Response getUser(User user) throws UserNotFound{
+        UserDTO userDTO = FACADE.getUserByUserName(user.getUserName());
+        return Response.ok(userDTO).build();
+    }
+
     
 }
