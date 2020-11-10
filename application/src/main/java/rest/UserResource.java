@@ -25,7 +25,7 @@ import javax.ws.rs.core.SecurityContext;
 import utils.EMF_Creator;
 
 /**
- * @author lam@cphbusiness.dk
+ * @author Mathias Nielsen
  */
 @Path("info")
 public class UserResource {
