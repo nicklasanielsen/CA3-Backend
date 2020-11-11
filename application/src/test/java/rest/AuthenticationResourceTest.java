@@ -92,10 +92,10 @@ public class AuthenticationResourceTest {
             em.getTransaction().commit();
         } finally {
             em.close();
-            emf.close();
-            EMF_Creator.endREST_TestWithDB();
-            httpServer.shutdownNow();
         }
+
+        EMF_Creator.endREST_TestWithDB();
+        httpServer.shutdownNow();
     }
 
     @BeforeEach

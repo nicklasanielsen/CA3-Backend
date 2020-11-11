@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,7 +21,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 import utils.EMF_Creator;
 
 /**
@@ -65,9 +62,9 @@ public class UserResourceTest {
         RestAssured.defaultParser = Parser.JSON;
         role1 = new Role("User");
         role2 = new Role("Admin");
-        
+
         EntityManager em = emf.createEntityManager();
-        
+
         try {
             em.getTransaction().begin();
             em.persist(role1);
@@ -80,8 +77,6 @@ public class UserResourceTest {
 
     @AfterAll
     public static void tearDownClass() {
-        EMF_Creator.endREST_TestWithDB();
-        httpServer.shutdownNow();
         EntityManager em = emf.createEntityManager();
 
         try {
@@ -91,6 +86,9 @@ public class UserResourceTest {
         } finally {
             em.close();
         }
+
+        EMF_Creator.endREST_TestWithDB();
+        httpServer.shutdownNow();
     }
 
     @BeforeEach
@@ -129,8 +127,6 @@ public class UserResourceTest {
     }
 
     //This is how we hold on to the token after login, similar to that a client must store the token somewhere
-    
-
     //Utility method to login and set the returned securityToken
     private static String login(String username, String password) {
         return given()
@@ -162,7 +158,7 @@ public class UserResourceTest {
                 .statusCode(200)
                 .body("msg", equalTo("Hello to User: userName"));
     }
-    
+
     @Test
     public void testGetFromUserAsAdmin() {
         securityToken = login("admin", "1234");
@@ -187,7 +183,7 @@ public class UserResourceTest {
                 .statusCode(200)
                 .body("msg", equalTo("Hello to (admin) User: admin"));
     }
-    
+
     @Test
     public void testGetFromAdminAsUser() {
         securityToken = login("userName", "password123");
@@ -213,5 +209,5 @@ public class UserResourceTest {
                 .statusCode(200)
                 .body();
     }
-    */
+     */
 }
