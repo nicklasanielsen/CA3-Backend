@@ -48,6 +48,7 @@ public class AuthenticationResourceTest {
     private static User user;
     private static List<Role> roles;
     private static Role role;
+    private static String password;
     private static String securityToken;
     private static SecretKey secretKey;
 
@@ -103,7 +104,8 @@ public class AuthenticationResourceTest {
         EntityManager em = emf.createEntityManager();
 
         roles.add(role);
-        user = new User("user", "TestFirstName", "TestLastName", "STRONG_PASSWORD", roles);
+        password = "STRONG_PASSWORD";
+        user = new User("user", "TestFirstName", "TestLastName", password, roles);
 
         try {
             em.getTransaction().begin();
@@ -119,6 +121,7 @@ public class AuthenticationResourceTest {
         EntityManager em = emf.createEntityManager();
 
         user = null;
+        password = null;
         securityToken = null;
 
         try {
@@ -133,7 +136,7 @@ public class AuthenticationResourceTest {
     private static String login(String username, String password) {
         return given()
                 .contentType(ContentType.JSON)
-                .body(String.format("{username: \"%s\", password: \"%s\"}", username, password))
+                .body(String.format("{userName: \"%s\", password: \"%s\"}", username, password))
                 .when().post("/auth/login")
                 .then()
                 .extract().path("token");
@@ -151,7 +154,7 @@ public class AuthenticationResourceTest {
         String expected = user.getUserName();
 
         // Act
-        securityToken = login(user.getUserName(), "STRONG_PASSWORD");
+        securityToken = login(user.getUserName(), password);
         Claims claims = getClaims(securityToken);
         String actual = claims.getSubject();
 
@@ -165,7 +168,7 @@ public class AuthenticationResourceTest {
         String expected = user.getUserName();
 
         // Act
-        securityToken = login(user.getUserName(), "STRONG_PASSWORD");
+        securityToken = login(user.getUserName(), password);
         Claims claims = getClaims(securityToken);
         String actual = claims.get("username", String.class);
 
@@ -185,7 +188,7 @@ public class AuthenticationResourceTest {
         String expected = String.join(",", rolesArray);
 
         // Act
-        securityToken = login(user.getUserName(), "STRONG_PASSWORD");
+        securityToken = login(user.getUserName(), password);
         Claims claims = getClaims(securityToken);
         String actual = claims.get("roles", String.class);
 
@@ -199,7 +202,7 @@ public class AuthenticationResourceTest {
         String expected = "NewBiz";
 
         // Act
-        securityToken = login(user.getUserName(), "STRONG_PASSWORD");
+        securityToken = login(user.getUserName(), password);
         Claims claims = getClaims(securityToken);
         String actual = claims.getIssuer();
 
@@ -213,7 +216,7 @@ public class AuthenticationResourceTest {
         long expected = 30;
 
         // Act
-        securityToken = login(user.getUserName(), "STRONG_PASSWORD");
+        securityToken = login(user.getUserName(), password);
 
         Claims claims = getClaims(securityToken);
         Date issuedAt = claims.getIssuedAt();
@@ -231,7 +234,7 @@ public class AuthenticationResourceTest {
     public void login_Failed_Invalid_Username() {
         given()
                 .contentType(ContentType.JSON)
-                .body(String.format("{username: \"%s\", password: \"%s\"}", "", "STRONG_PASSWORD"))
+                .body(String.format("{userName: \"%s\", password: \"%s\"}", "", password))
                 .when().post("/auth/login")
                 .then()
                 .assertThat()
@@ -243,12 +246,49 @@ public class AuthenticationResourceTest {
     public void login_Failed_Incorrect_Password() {
         given()
                 .contentType(ContentType.JSON)
-                .body(String.format("{username: \"%s\", password: \"%s\"}", user.getUserName(), ""))
+                .body(String.format("{userName: \"%s\", password: \"%s\"}", user.getUserName(), ""))
                 .when().post("/auth/login")
                 .then()
                 .assertThat()
                 .body("code", is(HttpStatus.FORBIDDEN_403.getStatusCode())).and()
                 .body("message", is("Invalid username and/or password."));
+    }
+
+    @Test
+    public void register_Success() {
+        // Arrange
+        String expected = "TestUserNotAddedBeforeNow";
+
+        // Act
+        String actual = given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{userName: \"%s\", "
+                        + "firstName: \"%s\", "
+                        + "lastName: \"%s\" , "
+                        + "password: \"%s\"}",
+                        expected, user.getFirstName(), user.getLastName(), password))
+                .when().post("/auth/register")
+                .then()
+                .extract().path("userName");
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void register_Failed_Username_In_Use() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{userName: \"%s\", "
+                        + "firstName: \"%s\", "
+                        + "lastName: \"%s\" , "
+                        + "password: \"%s\"}",
+                        user.getUserName(), user.getFirstName(), user.getLastName(), password))
+                .when().post("/auth/register")
+                .then()
+                .assertThat()
+                .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
+                .body("message", is("Username already in use."));
     }
 
 }

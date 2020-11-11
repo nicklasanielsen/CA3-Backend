@@ -26,6 +26,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import errorhandling.exceptions.AuthenticationException;
+import errorhandling.exceptions.DatabaseException;
+import errorhandling.exceptions.UserCreationException;
 import javax.persistence.EntityManagerFactory;
 import security.SharedSecret;
 import utils.EMF_Creator;
@@ -53,7 +55,7 @@ public class AuthenticationResource {
         // Extracts login credentials
         try {
             JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
-            username = json.get("username").getAsString();
+            username = json.get("userName").getAsString();
             password = json.get("password").getAsString();
         } catch (JsonSyntaxException e) {
             throw new API_Exception("Malformed JSON Suplied", 400, e);
@@ -65,13 +67,53 @@ public class AuthenticationResource {
             String token = createToken(user);
 
             // Preparing respone
-            jsonObject.addProperty("username", user.getUserName());
+            jsonObject.addProperty("userName", user.getUserName());
             jsonObject.addProperty("token", token);
 
             return Response.ok(GSON.toJson(jsonObject)).build();
         } catch (JOSEException | AuthenticationException e) {
             if (e instanceof AuthenticationException) {
                 throw (AuthenticationException) e;
+            }
+
+            throw new API_Exception("Something went wrong, please try again later ...");
+        }
+    }
+
+    @POST
+    @Path("register")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response register(String jsonString) throws AuthenticationException, API_Exception, DatabaseException, UserCreationException {
+        String username, firstname, lastname, password;
+        JsonObject jsonObject = new JsonObject();
+
+        // Extracts user credentials
+        try {
+            JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
+            username = json.get("userName").getAsString();
+            firstname = json.get("firstName").getAsString();
+            lastname = json.get("lastName").getAsString();
+            password = json.get("password").getAsString();
+        } catch (JsonSyntaxException e) {
+            throw new API_Exception("Malformed JSON Suplied", 400, e);
+        }
+
+        // Creating user and signing in if possible
+        try {
+            UserDTO user = USER_FACADE.createUser(username, firstname, lastname, password);
+            String token = createToken(user);
+
+            // Preparing respone
+            jsonObject.addProperty("userName", user.getUserName());
+            jsonObject.addProperty("token", token);
+
+            return Response.ok(GSON.toJson(jsonObject)).build();
+        } catch (JOSEException | DatabaseException | UserCreationException e) {
+            if (e instanceof DatabaseException) {
+                throw (DatabaseException) e;
+            } else if (e instanceof UserCreationException) {
+                throw (UserCreationException) e;
             }
 
             throw new API_Exception("Something went wrong, please try again later ...");

@@ -51,7 +51,7 @@ public class UserFacade {
         try {
             // Checking if username is in use
             if (em.find(User.class, username) != null) {
-                throw new UserCreationException("username already in use");
+                throw new UserCreationException("Username already in use.");
             }
 
             em.getTransaction().begin();
