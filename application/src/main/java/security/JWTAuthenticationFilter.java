@@ -4,7 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.SignedJWT;
-import security.errorhandling.AuthenticationException;
+import errorhandling.exceptions.AuthenticationException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.text.ParseException;
@@ -44,7 +44,7 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
             String token = request.getHeaderString("x-access-token");//
 
             if (token == null) {
-                request.abortWith(errorhandling.GenericExceptionMapper.makeErrRes("Not authenticated - do login", 403));
+                request.abortWith(errorhandling.mappers.GenericExceptionMapper.makeErrRes("Not authenticated - do login", 403));
                 return;
             }
 
@@ -53,7 +53,7 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
                 request.setSecurityContext(new JWTSecurityContext(user, request));
             } catch (AuthenticationException | ParseException | JOSEException ex) {
                 Logger.getLogger(JWTAuthenticationFilter.class.getName()).log(Level.SEVERE, null, ex);
-                request.abortWith(errorhandling.GenericExceptionMapper.makeErrRes("Token not valid (timed out?)", 403));
+                request.abortWith(errorhandling.mappers.GenericExceptionMapper.makeErrRes("Token not valid (timed out?)", 403));
             }
         }
     }

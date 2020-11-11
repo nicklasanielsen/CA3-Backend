@@ -3,15 +3,15 @@ package facades;
 import DTOs.UserDTO;
 import entities.Role;
 import entities.User;
-import errorhandling.DatabaseException;
-import errorhandling.UserCreationException;
-import errorhandling.UserNotFound;
+import errorhandling.exceptions.DatabaseException;
+import errorhandling.exceptions.UserCreationException;
+import errorhandling.exceptions.UserNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import security.errorhandling.AuthenticationException;
+import errorhandling.exceptions.AuthenticationException;
 
 /**
  *
@@ -97,14 +97,14 @@ public class UserFacade {
         }
     }
 
-    public UserDTO getUserByUserName(String username) throws UserNotFound {
+    public UserDTO getUserByUserName(String username) throws UserNotFoundException {
         EntityManager em = getEntityManager();
 
         try {
             User user = em.find(User.class, username);
 
             if (user == null) {
-                throw new UserNotFound(username);
+                throw new UserNotFoundException(username);
             }
 
             return new UserDTO(user);

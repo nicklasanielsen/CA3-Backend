@@ -1,9 +1,10 @@
-package security.errorhandling;
+package errorhandling.mappers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import errorhandling.ExceptionDTO;
+import DTOs.ExceptionDTO;
 import javax.servlet.ServletContext;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -15,15 +16,15 @@ import javax.ws.rs.ext.Provider;
  * @author Nicklas Nielsen
  */
 @Provider
-public class AuthenticationExceptionMapper implements ExceptionMapper<AuthenticationException> {
+public class NotAuthorizedExceptionMapper implements ExceptionMapper<NotAuthorizedException> {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final int ERROR_CODE = 403;
+    private static final int ERROR_CODE = 401;
     @Context
     ServletContext context;
 
     @Override
-    public Response toResponse(AuthenticationException ex) {
+    public Response toResponse(NotAuthorizedException ex) {
         ExceptionDTO err = new ExceptionDTO(ERROR_CODE, ex.getMessage());
         return Response.status(ERROR_CODE).entity(gson.toJson(err)).type(MediaType.APPLICATION_JSON).build();
     }

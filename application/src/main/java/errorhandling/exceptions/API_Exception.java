@@ -1,4 +1,4 @@
-package errorhandling;
+package errorhandling.exceptions;
 
 /**
  *
@@ -15,15 +15,16 @@ public class API_Exception extends Exception {
 
     public API_Exception(String message, int errCode) {
         super(message);
-        this.errorCode = errCode;
+        errorCode = errCode;
     }
 
     public API_Exception(String message) {
         super(message);
-        this.errorCode = 400;
+        errorCode = 400;
     }
 
     public int getErrorCode() {
         return errorCode;
     }
+
 }

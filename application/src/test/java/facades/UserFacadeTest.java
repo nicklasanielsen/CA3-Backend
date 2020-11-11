@@ -3,9 +3,9 @@ package facades;
 import DTOs.UserDTO;
 import entities.Role;
 import entities.User;
-import errorhandling.DatabaseException;
-import errorhandling.UserCreationException;
-import errorhandling.UserNotFound;
+import errorhandling.exceptions.DatabaseException;
+import errorhandling.exceptions.UserCreationException;
+import errorhandling.exceptions.UserNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import security.errorhandling.AuthenticationException;
+import errorhandling.exceptions.AuthenticationException;
 import utils.EMF_Creator;
 
 /**
@@ -138,7 +138,7 @@ public class UserFacadeTest {
     }
 
     @Test
-    public void getUserByUserName_Success() throws UserNotFound {
+    public void getUserByUserName_Success() throws UserNotFoundException {
         // Arrange
         UserDTO expected = userDTO;
 
@@ -153,7 +153,7 @@ public class UserFacadeTest {
     public void getUserByUserName_User_Not_Found() {
         user.setUserName("testUser");
 
-        assertThrows(UserNotFound.class, () -> {
+        assertThrows(UserNotFoundException.class, () -> {
             facade.getUserByUserName(user.getUserName());
         });
     }
