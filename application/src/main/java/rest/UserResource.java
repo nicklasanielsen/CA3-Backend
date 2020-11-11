@@ -38,30 +38,6 @@ public class UserResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getInfoForAll() {
-        return "{\"msg\":\"Hello anonymous\"}";
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("user")
-    @RolesAllowed("User")
-    public Response getFromUser() {
-        String thisUser = securityContext.getUserPrincipal().getName();
-        return Response.ok("{\"msg\": \"Hello to User: " + thisUser + "\"}").build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("admin")
-    @RolesAllowed("Admin")
-    public Response getFromAdmin() {
-        String thisUser = securityContext.getUserPrincipal().getName();
-        return Response.ok("{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}").build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("allUsers")
     @RolesAllowed("Admin")
     public Response getAllUsers() {

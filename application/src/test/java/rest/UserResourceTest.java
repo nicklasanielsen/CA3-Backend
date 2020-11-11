@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -147,66 +148,6 @@ public class UserResourceTest {
     }
 
     @Test
-    public void testGetInfoForAll() {
-        given()
-                .contentType("application/json")
-                .when()
-                .get("/info").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello anonymous"));
-    }
-
-    @Test
-    public void testGetFromUser() {
-        securityToken = login("userName", "password123");
-        given()
-                .contentType("application/json")
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/user").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to User: userName"));
-    }
-
-    @Test
-    public void testGetFromUserAsAdmin() {
-        securityToken = login("admin", "1234");
-        given()
-                .contentType("application/json")
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/user").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to User: admin"));
-    }
-
-    @Test
-    public void testGetFromAdmin() {
-        securityToken = login("admin", "1234");
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/admin").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to (admin) User: admin"));
-    }
-
-    @Test
-    public void testGetFromAdminAsUser() {
-        securityToken = login("userName", "password123");
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/admin").then()
-                .statusCode(401)
-                .body("msg", equalTo(null));
-    }
-
-    @Test
     public void testGetAllUsersOnUsername() {
         List<String> userNames = new ArrayList();
 
@@ -236,7 +177,8 @@ public class UserResourceTest {
                 .when()
                 .get("/info/allUsers").then()
                 .statusCode(401)
-                .body("msg", equalTo(null));
+                .body("code", is(HttpStatus.UNAUTHORIZED_401.getStatusCode())).and()
+                .body("message", is("You are not authorized to perform the requested operation"));
     }
 
     @Test
@@ -256,20 +198,37 @@ public class UserResourceTest {
                 .body("fullName", is(usersFName + " " + usersLName));
     }
 
-    /*@Test
-    public void testGetUserAsAdmin() {
-        String adminUser = users.get(1).getUserName();
-        String usersFName = users.get(1).getFirstName();
-        String usersLName = users.get(1).getLastName();
+    @Test
+    public void testGetUserNotFound() {
+        String user = users.get(0).getUserName();
+        String usersFName = users.get(0).getFirstName();
+        String usersLName = users.get(0).getLastName();
 
+        securityToken = login("userName", "password123");
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/fail").then()
+                .statusCode(400)
+                .assertThat()
+                .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
+                .body("message", is("Couldn't find user with username: fail"));
+    }
+
+    @Test
+    public void testGetUserAsAdmin() {
         securityToken = login("admin", "1234");
         given()
-            .contentType("application/json")
-            .accept(ContentType.JSON)
-            .header("x-access-token", securityToken)
-            .when()
-            .get("/info/" + user).then()
-            .statusCode(200)
-            .body("fullName", is(usersFName2 + " " + usersLName2));
-    }*/
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/admin")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("fullName", is("Admin Jensen"));
+    }
 }
