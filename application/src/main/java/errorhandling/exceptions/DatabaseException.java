@@ -1,4 +1,4 @@
-package errorhandling;
+package errorhandling.exceptions;
 
 /**
  *

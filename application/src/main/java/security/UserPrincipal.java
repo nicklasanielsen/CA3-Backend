@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * @author Nicklas Nielsen
+ */
 public class UserPrincipal implements Principal {
 
     private String username;

@@ -84,8 +84,6 @@ public class UserResourceTest {
 
     @AfterAll
     public static void tearDownClass() {
-        EMF_Creator.endREST_TestWithDB();
-        httpServer.shutdownNow();
         EntityManager em = emf.createEntityManager();
 
         try {
@@ -93,8 +91,10 @@ public class UserResourceTest {
             em.createNamedQuery("User.deleteAllRows").executeUpdate();
             em.getTransaction().commit();
         } finally {
+            EMF_Creator.endREST_TestWithDB();
             em.close();
         }
+        httpServer.shutdownNow();
     }
 
     @BeforeEach
@@ -260,7 +260,7 @@ public class UserResourceTest {
             .body("fullName", is(usersFName + " " + usersLName));
     }
     
-    /*@Test
+    @Test
     public void testGetUserAsAdmin() {
         String adminUser = users.get(1).getUserName();
         String usersFName = users.get(1).getFirstName();
@@ -276,5 +276,5 @@ public class UserResourceTest {
             .get("/info/" + adminUser).then()
             .statusCode(200)
             .body("fullName", is(usersFName + " " + usersLName));
-    }*/
+    }
 }
