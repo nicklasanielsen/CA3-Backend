@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -25,7 +23,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 import utils.EMF_Creator;
 
 /**
@@ -69,9 +66,9 @@ public class UserResourceTest {
         RestAssured.defaultParser = Parser.JSON;
         role1 = new Role("User");
         role2 = new Role("Admin");
-        
+
         EntityManager em = emf.createEntityManager();
-        
+
         try {
             em.getTransaction().begin();
             em.persist(role1);
@@ -88,12 +85,13 @@ public class UserResourceTest {
 
         try {
             em.getTransaction().begin();
-            em.createNamedQuery("User.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Role.deleteAllRows").executeUpdate();
             em.getTransaction().commit();
         } finally {
-            EMF_Creator.endREST_TestWithDB();
             em.close();
         }
+        
+        EMF_Creator.endREST_TestWithDB();
         httpServer.shutdownNow();
     }
 
@@ -138,8 +136,6 @@ public class UserResourceTest {
     }
 
     //This is how we hold on to the token after login, similar to that a client must store the token somewhere
-    
-
     //Utility method to login and set the returned securityToken
     private static String login(String username, String password) {
         return given()
@@ -171,7 +167,7 @@ public class UserResourceTest {
                 .statusCode(200)
                 .body("msg", equalTo("Hello to User: userName"));
     }
-    
+
     @Test
     public void testGetFromUserAsAdmin() {
         securityToken = login("admin", "1234");
@@ -196,7 +192,7 @@ public class UserResourceTest {
                 .statusCode(200)
                 .body("msg", equalTo("Hello to (admin) User: admin"));
     }
-    
+
     @Test
     public void testGetFromAdminAsUser() {
         securityToken = login("userName", "password123");
@@ -260,7 +256,7 @@ public class UserResourceTest {
             .body("fullName", is(usersFName + " " + usersLName));
     }
     
-    @Test
+    /*@Test
     public void testGetUserAsAdmin() {
         String adminUser = users.get(1).getUserName();
         String usersFName = users.get(1).getFirstName();
@@ -276,5 +272,5 @@ public class UserResourceTest {
             .get("/info/" + adminUser).then()
             .statusCode(200)
             .body("fullName", is(usersFName + " " + usersLName));
-    }
+    }*/
 }

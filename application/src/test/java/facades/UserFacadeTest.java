@@ -50,7 +50,6 @@ public class UserFacadeTest {
             em.getTransaction().commit();
         } finally {
             em.close();
-            emf.close();
         }
     }
 
