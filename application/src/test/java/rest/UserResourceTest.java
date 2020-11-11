@@ -17,6 +17,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
@@ -41,6 +43,7 @@ public class UserResourceTest {
     private static List<Role> roles;
     private static List<Role> adminRole;
     private static String securityToken;
+    private static List<User> users;
 
     static final URI BASE_URI = UriBuilder.fromUri(SERVER_URL).port(SERVER_PORT).build();
     private static HttpServer httpServer;
@@ -58,6 +61,7 @@ public class UserResourceTest {
 
         roles = new ArrayList<>();
         adminRole = new ArrayList<>();
+        users = new ArrayList<>();
 
         httpServer = startServer();
         RestAssured.baseURI = SERVER_URL;
@@ -98,9 +102,12 @@ public class UserResourceTest {
         EntityManager em = emf.createEntityManager();
 
         roles.add(role1);
+        adminRole.add(role1);
         adminRole.add(role2);
         user = new User("userName", "Sven", "Bentsen", "password123", roles);
         admin = new User("admin", "Admin", "Jensen", "1234", adminRole);
+        users.add(user);
+        users.add(admin);
 
         try {
             em.getTransaction().begin();
@@ -116,6 +123,8 @@ public class UserResourceTest {
     @AfterEach
     public void tearDown() {
         roles.clear();
+        adminRole.clear();
+        users.clear();
 
         EntityManager em = emf.createEntityManager();
 
@@ -171,8 +180,8 @@ public class UserResourceTest {
                 .header("x-access-token", securityToken)
                 .when()
                 .get("/info/user").then()
-                .statusCode(401)
-                .body("msg", equalTo(null));
+                .statusCode(200)
+                .body("msg", equalTo("Hello to User: admin"));
     }
 
     @Test
@@ -200,10 +209,16 @@ public class UserResourceTest {
                 .statusCode(401)
                 .body("msg", equalTo(null));
     }
-    /*
+
     @Test
-    public void testGetAllUsers(){
-        securityToken = login("user", "password123");
+    public void testGetAllUsersOnUsername(){
+        List<String> userNames = new ArrayList();
+        
+        users.forEach(User -> {
+            userNames.add(User.getUserName());
+        });
+        
+        securityToken = login("admin", "1234");
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
@@ -211,7 +226,55 @@ public class UserResourceTest {
                 .when()
                 .get("/info/allUsers").then()
                 .statusCode(200)
-                .body();
+                .assertThat()
+                .body("userName", hasItems(userNames.toArray(new String[0])));
     }
-    */
+    
+    @Test
+    public void testGetAllUsersOnUsernameAsUser(){
+        securityToken = login("userName", "password123");
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/allUsers").then()
+                .statusCode(401)
+                .body("msg", equalTo(null));
+    }
+    
+    @Test
+    public void testGetUser() {
+        String user = users.get(0).getUserName();
+        String usersFName = users.get(0).getFirstName();
+        String usersLName = users.get(0).getLastName();
+        
+        securityToken = login("userName", "password123");
+        given()
+            .contentType("application/json")
+            .accept(ContentType.JSON)
+            .header("x-access-token", securityToken)
+            .when()
+            .get("/info/" + user).then()
+            .statusCode(200)
+            .body("fullName", is(usersFName + " " + usersLName));
+    }
+    
+    /*@Test
+    public void testGetUserAsAdmin() {
+        String adminUser = users.get(1).getUserName();
+        String usersFName = users.get(1).getFirstName();
+        String usersLName = users.get(1).getLastName();
+        
+        securityToken = login("admin", "1234");
+        System.out.println(securityToken);
+        given()
+            .contentType("application/json")
+            .accept(ContentType.JSON)
+            .header("x-access-token", securityToken)
+            .when()
+            .get("/info/" + adminUser).then()
+            .statusCode(200)
+            .body("fullName", is(usersFName + " " + usersLName));
+    }*/
 }

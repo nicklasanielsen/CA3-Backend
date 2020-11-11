@@ -20,6 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -68,7 +69,7 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("allUsers")
-    @RolesAllowed("admin")
+    @RolesAllowed("Admin")
     public Response getAllUsers(){
         List<UserDTO> users = FACADE.getAllUsers();
         return Response.ok(users).build();
@@ -76,10 +77,10 @@ public class UserResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("getUser")
+    @Path("{userName}")
     @RolesAllowed("User")
-    public Response getUser(User user) throws UserNotFound{
-        UserDTO userDTO = FACADE.getUserByUserName(user.getUserName());
+    public Response getUser(@PathParam("userName") String user) throws UserNotFound{
+        UserDTO userDTO = FACADE.getUserByUserName(user);
         return Response.ok(userDTO).build();
     }
 
