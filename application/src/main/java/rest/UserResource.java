@@ -3,22 +3,16 @@ package rest;
 import DTOs.UserDTO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import errorhandling.exceptions.DatabaseException;
-import errorhandling.exceptions.UserCreationException;
 import facades.UserFacade;
 import entities.User;
-import errorhandling.UserNotFound;
+import errorhandling.exceptions.UserNotFoundException;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -64,21 +58,21 @@ public class UserResource {
         String thisUser = securityContext.getUserPrincipal().getName();
         return Response.ok("{\"msg\": \"Hello to (admin) User: " + thisUser + "\"}").build();
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("allUsers")
     @RolesAllowed("admin")
-    public Response getAllUsers(){
+    public Response getAllUsers() {
         List<UserDTO> users = FACADE.getAllUsers();
         return Response.ok(users).build();
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("getUser")
     @RolesAllowed("User")
-    public Response getUser(User user) throws UserNotFound{
+    public Response getUser(User user) throws UserNotFoundException {
         UserDTO userDTO = FACADE.getUserByUserName(user.getUserName());
         return Response.ok(userDTO).build();
     }
