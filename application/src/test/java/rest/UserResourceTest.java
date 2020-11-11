@@ -263,14 +263,13 @@ public class UserResourceTest {
         String usersLName = users.get(1).getLastName();
 
         securityToken = login("admin", "1234");
-        System.out.println(securityToken);
         given()
             .contentType("application/json")
             .accept(ContentType.JSON)
             .header("x-access-token", securityToken)
             .when()
-            .get("/info/" + adminUser).then()
+            .get("/info/" + user).then()
             .statusCode(200)
-            .body("fullName", is(usersFName + " " + usersLName));
+            .body("fullName", is(usersFName2 + " " + usersLName2));
     }*/
 }
