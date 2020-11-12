@@ -57,7 +57,7 @@ public class JokeFacade {
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             if (e instanceof TimeoutException) {
-                throw new FetchException("One or more of our partners did not respond when we tried to load one or more jokes, please try again later", 503);
+                throw new FetchException("One or more of our partners did not respond when we tried to load one or more jokes, please try again later..", 503);
             }
 
             throw new FetchException("A system error occurred when we first loaded one or more jokes from our partners, please contact us regarding the error, or try again later.", 500);

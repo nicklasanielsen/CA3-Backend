@@ -12,12 +12,38 @@ Are you interested in the project description? Then you can find it [here](https
 
 Are you interested in the frontend for this project? Then you can find it [here](https://github.com/nicklasanielsen/CA3-Frontend/).
 
-## Collaborators
+# Documentation
+
+To see all the documentation about a specific endpoint, access the documentation by clicking the link next to the endpoint in question.
+
+## Open Endpoints
+
+Open endpoints require no Authentication.
+
+* [Login](docs/auth/login.md) : `POST /api/auth/login/`
+* [Register](docs/auth/register.md) : `POST / api/auth/register/`
+
+## Closed Endpoints
+
+Closed endpoints require a valid Token to be included in the header of the request. A Token can be acquired from the open endpoints above.
+
+The token must be provided under header-key `x-access-token`.
+
+### User related
+
+* [Get all users](docs/info/allUsers.md) : `GET /api/info/allUsers/`
+* [Get info about user by username](docs/info/infoByUsername.md) : `GET /api/info/{username}/`
+
+### Joke related
+
+* [Get random jokes](docs/fun/jokes.md) : `GET /api/fun/jokes/`
+
+# Collaborators
 
 * Mathias Haugaard Nielsen also known as [Haugaard-DK](https://github.com/Haugaard-DK).
 * Nicklas Alexander Nielsen also known as [nicklasanielsen](https://github.com/nicklasanielsen).
 * Nikolaj Larsen also known as [Nearial](https://github.com/Nearial).
 
-## License
+# License
 
 This project is covered by the MIT license, see [LICENSE](https://github.com/nicklasanielsen/CA3-Backend/blob/master/LICENSE) for more information.
