@@ -4,7 +4,6 @@ import DTOs.UserDTO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import facades.UserFacade;
-import entities.User;
 import errorhandling.exceptions.UserNotFoundException;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
@@ -22,6 +21,7 @@ import utils.EMF_Creator;
 
 /**
  * @author Mathias Nielsen
+ * @author Nicklas Nielsen
  */
 @Path("info")
 public class UserResource {
@@ -37,19 +37,19 @@ public class UserResource {
     SecurityContext securityContext;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("allUsers")
     @RolesAllowed("Admin")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
         List<UserDTO> users = FACADE.getAllUsers();
         return Response.ok(users).build();
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("{userName}")
     @RolesAllowed("User")
-    public Response getUser(@PathParam("userName") String user) throws UserNotFoundException{
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUser(@PathParam("userName") String user) throws UserNotFoundException {
         UserDTO userDTO = FACADE.getUserByUserName(user);
         return Response.ok(userDTO).build();
     }
