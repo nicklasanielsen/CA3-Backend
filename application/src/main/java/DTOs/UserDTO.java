@@ -2,8 +2,8 @@ package DTOs;
 
 import entities.Role;
 import entities.User;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +16,7 @@ public class UserDTO {
     private String userName;
     private String fullName;
     private List<RoleDTO> roleList = new ArrayList<>();
-    private Date created;
+    private String created;
 
     public UserDTO(User user) {
         this.userName = user.getUserName();
@@ -26,7 +26,8 @@ public class UserDTO {
             roleList.add(new RoleDTO(role));
         }
 
-        this.created = user.getCreated();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        created = dateFormatter.format(user.getCreated());
     }
 
     public String getUserName() {
@@ -37,7 +38,7 @@ public class UserDTO {
         return fullName;
     }
 
-    public Date getCreated() {
+    public String getCreated() {
         return created;
     }
 

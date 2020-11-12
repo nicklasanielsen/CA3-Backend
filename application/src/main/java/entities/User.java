@@ -54,7 +54,7 @@ public class User implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "CREATED")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
     @Basic(optional = false)

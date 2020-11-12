@@ -25,7 +25,7 @@ ___
 ```json
 [
     {
-        "created": "Timestamp for when the user was created",
+        "created": "yyyy-MM-dd HH:mm:ss Time zone",
         "userName": "Users username",
         "fullName": "Users fullname",
         "roleList": [
@@ -38,7 +38,7 @@ ___
         ]
     },
     {
-        "created": "Timestamp for when the user was created",
+        "created": "yyyy-MM-dd HH:mm:ss Time zone",
         "userName": "Users username",
         "fullName": "Users fullname",
         "roleList": [
