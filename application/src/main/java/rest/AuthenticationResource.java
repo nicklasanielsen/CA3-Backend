@@ -57,7 +57,7 @@ public class AuthenticationResource {
             JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
             username = json.get("userName").getAsString();
             password = json.get("password").getAsString();
-        } catch (JsonSyntaxException e) {
+        } catch (Exception e) {
             throw new API_Exception("Malformed JSON Suplied", 400, e);
         }
 
@@ -95,7 +95,7 @@ public class AuthenticationResource {
             firstname = json.get("firstName").getAsString();
             lastname = json.get("lastName").getAsString();
             password = json.get("password").getAsString();
-        } catch (JsonSyntaxException e) {
+        } catch (Exception e) {
             throw new API_Exception("Malformed JSON Suplied", 400, e);
         }
 
