@@ -41,7 +41,7 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext request) throws IOException {
         if (isSecuredResource()) {
-            String token = request.getHeaderString("x-access-token");//
+            String token = request.getHeaderString("x-access-token");
 
             if (token == null) {
                 request.abortWith(errorhandling.mappers.GenericExceptionMapper.makeErrRes("Not authenticated - do login", 403));
