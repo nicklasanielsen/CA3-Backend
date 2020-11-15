@@ -42,6 +42,10 @@ public class UserFacade {
     }
 
     public UserDTO createUser(String username, String firstName, String lastName, String password) throws DatabaseException, UserCreationException {
+        if (username.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || password.isEmpty()) {
+            throw new UserCreationException("Not all user credentials was provided.");
+        }
+
         EntityManager em = getEntityManager();
 
         List<Role> defaultRoles = roleFacade.getDefaultRoles();
@@ -72,8 +76,6 @@ public class UserFacade {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-
-            System.out.println(e);
 
             throw new DatabaseException("Something went wrong! Failed to create user, please try again later.");
         } finally {
