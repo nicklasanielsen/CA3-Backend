@@ -1,7 +1,5 @@
 # Get all users
 
-___
-
 Used to get all registered users.
 
 

@@ -1,7 +1,5 @@
 # Get random jokes
 
-___
-
 Used to fetch random jokes from external joke API's.
 
 

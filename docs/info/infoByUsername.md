@@ -1,12 +1,10 @@
 # Get info about user by username
 
-___
-
 Used to get information about a specific user.
 
 
 
-**URL** : `/api/info/{username}/`
+**URL** : `/api/info/user/{username}/`
 
 **Method** : `GET`
 

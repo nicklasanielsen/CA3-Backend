@@ -1,7 +1,5 @@
 # Register
 
-___
-
 Used by non existing users to create a user.
 
 
@@ -84,6 +82,19 @@ ___
 {
     "code": 400,
     "message": "Username already in use."
+}
+```
+
+___
+
+**Scenario** : One and/or more of the required credentials was not provided.
+
+**Code** : 400
+
+```json
+{
+    "code": 400,
+    "message": "Not all user credentials was provided."
 }
 ```
 

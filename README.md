@@ -32,7 +32,7 @@ The token must be provided under header-key `x-access-token`.
 ### User related
 
 * [Get all users](docs/info/allUsers.md) : `GET /api/info/allUsers/`
-* [Get info about user by username](docs/info/infoByUsername.md) : `GET /api/info/{username}/`
+* [Get info about user by username](docs/info/infoByUsername.md) : `GET /api/info/user/{username}/`
 
 ### Joke related
 

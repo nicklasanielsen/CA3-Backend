@@ -1,7 +1,5 @@
 # Login
 
-___
-
 Used by existing users to login.
 
 
