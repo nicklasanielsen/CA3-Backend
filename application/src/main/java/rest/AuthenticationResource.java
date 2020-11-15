@@ -39,7 +39,7 @@ import utils.EMF_Creator;
 @Path("auth")
 public class AuthenticationResource {
 
-    public static final long TOKEN_EXPIRE_TIME = TimeUnit.NANOSECONDS.convert(30, TimeUnit.MINUTES); // 30 min
+    public static final long TOKEN_EXPIRE_TIME = TimeUnit.MILLISECONDS.convert(30, TimeUnit.MINUTES); // 30 min
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     public static final UserFacade USER_FACADE = UserFacade.getUserFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

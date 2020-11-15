@@ -222,8 +222,8 @@ public class AuthenticationResourceTest {
         Date issuedAt = claims.getIssuedAt();
         Date expiration = claims.getExpiration();
 
-        long issueTime = TimeUnit.MINUTES.convert(issuedAt.getTime(), TimeUnit.NANOSECONDS);
-        long expirationTime = TimeUnit.MINUTES.convert(expiration.getTime(), TimeUnit.NANOSECONDS);
+        long issueTime = TimeUnit.MINUTES.convert(issuedAt.getTime(), TimeUnit.MILLISECONDS);
+        long expirationTime = TimeUnit.MINUTES.convert(expiration.getTime(), TimeUnit.MILLISECONDS);
         long actual = expirationTime - issueTime;
 
         // Assert
