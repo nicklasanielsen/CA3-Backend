@@ -46,7 +46,7 @@ public class UserResource {
     }
 
     @GET
-    @Path("{userName}")
+    @Path("user/{userName}")
     @RolesAllowed("User")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("userName") String user) throws UserNotFoundException {
