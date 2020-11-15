@@ -37,7 +37,7 @@ public class HttpUtils {
         String jsonStr = null;
 
         try {
-            scan = new Scanner(connection.getInputStream());
+            scan = new Scanner(connection.getInputStream(), "UTF-8");
 
             if (scan.hasNext()) {
                 jsonStr = scan.nextLine();
